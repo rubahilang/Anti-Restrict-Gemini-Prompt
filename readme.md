@@ -14,7 +14,7 @@ Gemini Custom Prompt is a web application that leverages Google Generative AI to
 
 ```
 # Clone the Repository
-git clone <REPOSITORY_URL>
+git clone https://github.com/rubahilang/Anti-Restrict-Gemini-Prompt
 cd <PROJECT_DIRECTORY>
 
 # Install Dependencies
