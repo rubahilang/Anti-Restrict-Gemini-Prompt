@@ -31,7 +31,6 @@ npm install
 
 
 # You Can Make Your Own "Custom Gemini Prompt".
-
 # Change the file ./data/prompt.json. This Is My Prompt For "Anti-Restrict-Gemini-Prompt + Reasoning Feature":
 
 { "customPrompt":
