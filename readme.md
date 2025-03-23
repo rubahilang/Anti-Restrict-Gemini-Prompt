@@ -93,6 +93,5 @@ data/           - Contains key.json and prompt.json
 - [@google/generative-ai](https://www.npmjs.com/package/@google/generative-ai)
 - [Tailwind CSS](https://tailwindcss.com/)
 
-## License
-
-This project is licensed under the [MIT License](LICENSE).
+#
+Made With 💖 by RubahIlang
