@@ -39,7 +39,7 @@ echo '{
 
 ```
 # Start the Server
-node index.js
+node server.js
 # The application will be available at http://localhost:3000 (or on a different port if PORT env is set)
 ```
 
