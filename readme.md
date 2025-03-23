@@ -2,13 +2,7 @@
 
 Gemini Custom Prompt is a web application that leverages Google Generative AI to provide an interactive chat interface. This application features comprehensive details—including Reasoning, Final Prompt, and Answer—along with the ability to customize the prompt. By default, it uses the **Anti Restrict Gemini Prompt** as its built-in configuration.
 
-# Video Preview
-```
-<video width="640" height="360" controls>
-  <source src="/video/preview.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
-```
+![Preview](video/preview.gif)
 
 ## Features
 
