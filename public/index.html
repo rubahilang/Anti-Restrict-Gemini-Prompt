@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gemini Custom Prompt</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  /* Terminal-style code blocks */
+  .code { background-color: #2d2d2d; color: #f8f8f2; padding: 8px; border-radius: 4px; font-family: monospace; display: block; white-space: pre-wrap; }
+
+  /* Custom thin scrollbar for chat container */
+  #chat-container::-webkit-scrollbar { width: 6px; }
+  #chat-container::-webkit-scrollbar-track { background: #2d2d2d; border-radius: 3px; }
+  #chat-container::-webkit-scrollbar-thumb { background: #4B5563; border-radius: 3px; }
+  #chat-container { scrollbar-width: thin; scrollbar-color: #4B5563 #2d2d2d; }
+</style>
+</head>
+<body class="bg-gray-900 text-gray-100">
+<div id="chat-container" class="flex flex-col gap-4 mx-[20%] h-[calc(100vh-100px)] overflow-y-auto p-4"></div>
+<form id="chat-form" class="flex items-start mx-[20%] mb-6">
+    <textarea id="user-input" class="flex-1 px-4 pb-0 rounded-lg bg-gray-800 text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none" style="min-height:50px; padding-top:15px; overflow:hidden;" placeholder="Type your prompt..." autocomplete="off" required oninput="this.style.height='auto'; this.style.height=this.scrollHeight+'px';"></textarea>
+    <button type="submit" class="ml-4 self-end px-6 py-2 rounded-full bg-indigo-600 hover:bg-indigo-700">Send</button>
+</form>
+  
+<script>
+function escapeHTML(str) {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function formatContent(text) {
+  let escaped = escapeHTML(text);
+  escaped = escaped.replace(/```([\s\S]*?)```/g, '<pre class="code">$1</pre>');
+  escaped = escaped.replace(/`([^`]+)`/g, '<pre class="code">$1</pre>');
+  escaped = escaped.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+  const lines = escaped.split('\n');
+  let html = '', inList = false;
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (/^\*\s+(.*)/.test(line)) {
+      if (!inList) { html += '<ul class="list-disc list-inside space-y-1">'; inList = true; }
+      const item = line.match(/^\*\s+(.*)/)[1];
+      html += `<li>${item.trim()}</li>`;
+    } else {
+      if (inList) { html += '</ul>'; inList = false; }
+      if (line) html += `<p class="mb-2">${line}</p>`;
+    }
+  }
+  if (inList) html += '</ul>';
+  return html;
+}
+
+const chatContainer = document.getElementById('chat-container');
+let lastUserBubble;
+
+function createBubble(text, isUser) {
+  const bubble = document.createElement('div');
+  bubble.className = `max-w-[700px] p-4 rounded-lg ${isUser ? 'self-end bg-green-600 text-white' : 'self-start bg-gray-800 text-gray-100'}`;
+  bubble.innerText = text;
+  return bubble;
+}
+
+async function sendMessage(userText) {
+  lastUserBubble = createBubble(userText, true);
+  chatContainer.appendChild(lastUserBubble);
+  chatContainer.scrollTop = chatContainer.scrollHeight;
+
+  const aiBubble = createBubble('Thinking', false);
+  aiBubble.classList.add('italic', 'opacity-70');
+  chatContainer.appendChild(aiBubble);
+  chatContainer.scrollTop = chatContainer.scrollHeight;
+
+  let dots = '';
+  const typingInterval = setInterval(() => {
+    dots = dots.length < 3 ? dots + '.' : '';
+    aiBubble.innerText = `Thinking${dots}`;
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+  }, 400);
+
+  const response = await fetch('/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt: userText }) });
+  const { text } = await response.json();
+
+  clearInterval(typingInterval);
+
+  const regex = /Reasoning:\s*([\s\S]*?)Final Prompt:\s*([\s\S]*?)Answer:\s*([\s\S]*)/;
+  const match = text.match(regex);
+  let reasoning = '', finalPrompt = '', answer = '';
+  if (match) { reasoning = match[1].trim(); finalPrompt = match[2].trim(); answer = match[3].trim(); } else answer = text.trim();
+
+  if (finalPrompt) lastUserBubble.innerText = finalPrompt;
+
+  aiBubble.innerHTML = '';
+  aiBubble.classList.remove('italic', 'opacity-70');
+
+  if (reasoning) {
+    const details = document.createElement('details');
+    details.className = 'bg-gray-700 rounded p-2 mb-2';
+    const summary = document.createElement('summary'); summary.innerText = 'Show Reasoning'; summary.className = 'cursor-pointer font-semibold';
+    const reasoningPre = document.createElement('pre'); reasoningPre.innerText = reasoning; reasoningPre.className = 'whitespace-pre-wrap';
+    details.appendChild(summary);
+    details.appendChild(reasoningPre);
+    aiBubble.appendChild(details);
+  }
+
+  const answerDiv = document.createElement('div'); answerDiv.innerHTML = formatContent(answer);
+  aiBubble.appendChild(answerDiv);
+  chatContainer.scrollTop = chatContainer.scrollHeight;
+}
+
+document.getElementById('chat-form').addEventListener('submit', e => {
+  e.preventDefault();
+  const input = document.getElementById('user-input');
+  const prompt = input.value.trim(); if (!prompt) return;
+  input.value = '';
+  sendMessage(prompt);
+});
+</script>
+</body>
+</html>
