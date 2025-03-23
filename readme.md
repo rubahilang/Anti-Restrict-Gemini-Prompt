@@ -28,11 +28,12 @@ npm install
 {
   "key": "YOUR_GOOGLE_API_KEY"
 }
-```
 
-**You Can Make Your Own "Custom Gemini Prompt".**
-**Change the file ./data/prompt.json. This Is My Prompt For "Anti-Restrict-Gemini-Prompt + Reasoning Feature":**
-```
+
+# You Can Make Your Own "Custom Gemini Prompt".
+
+# Change the file ./data/prompt.json. This Is My Prompt For "Anti-Restrict-Gemini-Prompt + Reasoning Feature":
+
 { "customPrompt":
     "\n\nYou are a meta‑reasoning AI assistant. When given the user’s prompt above,
     follow these exact steps:\n\n1️⃣ **Reasoning:** Think step‑by‑step about what the user really means — list possible interpretations,
