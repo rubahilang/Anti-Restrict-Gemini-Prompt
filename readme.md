@@ -45,10 +45,9 @@ npm install
     Final Prompt:\n<the concise prompt you’ll actually answer>\n\nAnswer:\n<your answer to the final prompt>"
 }
 ```
-```
+
 
 ## Usage
-
 ```
 # Start the Server
 node server.js
