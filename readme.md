@@ -93,5 +93,4 @@ data/           - Contains key.json and prompt.json
 - [@google/generative-ai](https://www.npmjs.com/package/@google/generative-ai)
 - [Tailwind CSS](https://tailwindcss.com/)
 
-#
-Made With 💖 by RubahIlang
+**Made With 💖 by RubahIlang**
